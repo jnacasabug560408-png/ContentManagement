@@ -7,7 +7,6 @@ use App\Models\NewsComment;
 use App\Models\NewsLike;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class NewsController extends Controller
 {
@@ -48,20 +47,15 @@ class NewsController extends Controller
             'title'    => 'required|string|max:255',
             'body'     => 'required|string',
             'category' => 'nullable|string|max:100',
-            'photo'    => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'photo'    => 'nullable|string', // now a URL from Cloudinary
         ]);
-
-        $photoPath = null;
-        if ($request->hasFile('photo')) {
-            $photoPath = $request->file('photo')->store('news-photos', 'public');
-        }
 
         News::create([
             'user_id'  => Auth::id(),
             'title'    => $validated['title'],
             'body'     => $validated['body'],
             'category' => $validated['category'] ?? 'General',
-            'photo'    => $photoPath,
+            'photo'    => $request->input('photo') ?: null,
         ]);
 
         return redirect()->route('news.my')->with('success', 'News post published successfully!');
@@ -69,21 +63,21 @@ class NewsController extends Controller
 
     // Show single news post
     public function show(News $news, Request $request)
-{
-    $news->load(['user', 'comments.user', 'likes']);
+    {
+        $news->load(['user', 'comments.user', 'likes']);
 
-    // Track view using cache — once per IP per hour
-    $cacheKey = 'news_view_' . $news->id . '_' . $request->ip();
-    if (!\Cache::has($cacheKey)) {
-        \Cache::put($cacheKey, true, now()->addHours(1));
-        \Cache::increment('news_views_total_' . $news->id);
+        // Track view using cache — once per IP per hour
+        $cacheKey = 'news_view_' . $news->id . '_' . $request->ip();
+        if (!\Cache::has($cacheKey)) {
+            \Cache::put($cacheKey, true, now()->addHours(1));
+            \Cache::increment('news_views_total_' . $news->id);
+        }
+
+        $viewCount = \Cache::get('news_views_total_' . $news->id, 0);
+        $liked = Auth::check() ? $news->isLikedBy(Auth::id()) : false;
+
+        return view('news.show', compact('news', 'liked', 'viewCount'));
     }
-
-    $viewCount = \Cache::get('news_views_total_' . $news->id, 0);
-    $liked = Auth::check() ? $news->isLikedBy(Auth::id()) : false;
-
-    return view('news.show', compact('news', 'liked', 'viewCount'));
-}
 
     // Show edit form
     public function edit(News $news)
@@ -104,14 +98,15 @@ class NewsController extends Controller
             'title'    => 'required|string|max:255',
             'body'     => 'required|string',
             'category' => 'nullable|string|max:100',
-            'photo'    => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'photo'    => 'nullable|string', // now a URL from Cloudinary
         ]);
 
-        if ($request->hasFile('photo')) {
-            if ($news->photo) {
-                Storage::disk('public')->delete($news->photo);
-            }
-            $validated['photo'] = $request->file('photo')->store('news-photos', 'public');
+        // Only update photo if a new one was uploaded
+        if ($request->filled('photo')) {
+            $validated['photo'] = $request->input('photo');
+        } else {
+            // Keep existing photo
+            unset($validated['photo']);
         }
 
         $news->update($validated);
@@ -124,10 +119,6 @@ class NewsController extends Controller
     {
         $this->authorOnly();
         $this->ownerOnly($news);
-
-        if ($news->photo) {
-            Storage::disk('public')->delete($news->photo);
-        }
 
         $news->delete();
 
@@ -160,29 +151,29 @@ class NewsController extends Controller
 
     // Add comment
     public function comment(Request $request, News $news)
-{
-    $request->validate(['body' => 'required|string|max:1000']);
+    {
+        $request->validate(['body' => 'required|string|max:1000']);
 
-    $comment = NewsComment::create([
-        'news_id' => $news->id,
-        'user_id' => Auth::id(),
-        'body'    => $request->body,
-    ]);
+        $comment = NewsComment::create([
+            'news_id' => $news->id,
+            'user_id' => Auth::id(),
+            'body'    => $request->body,
+        ]);
 
-    $comment->load('user');
+        $comment->load('user');
 
-    return response()->json([
-        'success' => true,
-        'comment' => [
-            'id'         => $comment->id,
-            'body'       => e($comment->body),
-            'user_name'  => e($comment->user->name),
-            'user_role'  => strtoupper($comment->user->role),
-            'avatar'     => strtoupper(substr($comment->user->name, 0, 1)),
-            'created_at' => 'just now',
-        ],
-    ]);
-}
+        return response()->json([
+            'success' => true,
+            'comment' => [
+                'id'         => $comment->id,
+                'body'       => e($comment->body),
+                'user_name'  => e($comment->user->name),
+                'user_role'  => strtoupper($comment->user->role),
+                'avatar'     => strtoupper(substr($comment->user->name, 0, 1)),
+                'created_at' => 'just now',
+            ],
+        ]);
+    }
 
     // Delete comment
     public function deleteComment(NewsComment $comment)

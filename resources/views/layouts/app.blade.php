@@ -215,7 +215,10 @@
                 </a>
                 <a href="{{ route('news.my') }}" class="{{ request()->routeIs('news.my') ? 'active' : '' }}">
                     <i class="bi bi-broadcast"></i> My News
-                </a>    
+                </a>
+                <a href="{{ route('subscriber.comments') }}" class="{{ request()->routeIs('subscriber.comments') ? 'active' : '' }}">
+                    <i class="bi bi-chat-left-text-fill"></i> My Comments
+                </a>
                 <hr>
                 <div class="sidebar-label">Browse</div>
                 <a href="{{ route('posts.public.index') }}" class="{{ request()->routeIs('posts.public.*') ? 'active' : '' }}">
@@ -249,13 +252,6 @@
         </a>
     @endif
 
-    @if(Auth::user()->isEditor() || Auth::user()->isAdmin())
-        <hr>
-        <div class="sidebar-label">Moderation</div>
-        <a href="{{ route('comments.index') }}" ...>
-            <i class="bi bi-chat-square-dots-fill"></i> Comments
-        </a>
-    @endif
 
     @if(Auth::user()->isAdmin())
         <hr>
@@ -269,8 +265,11 @@
         <a href="{{ route('contents.moderation') }}" ...>
             <i class="bi bi-shield-lock-fill"></i> Moderation
         </a>
-        <a href="{{ route('analytics') }}" ...>
+        <a href="{{ route('analytics') }}" class="{{ request()->routeIs('analytics') ? 'active' : '' }}">
             <i class="bi bi-bar-chart-fill"></i> Analytics
+        </a>
+        <a href="{{ route('subscriber.comments') }}" class="{{ request()->routeIs('subscriber.comments') ? 'active' : '' }}">
+            <i class="bi bi-chat-left-text-fill"></i> My Comments
         </a>
     @endif
 

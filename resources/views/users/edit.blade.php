@@ -7,7 +7,7 @@
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Edit User</h5>
                 </div>
                 <div class="card-body">
@@ -16,14 +16,14 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="username" class="form-label">Username *</label>
+                                <label for="username" class="form-label">Username</label>
                                 <input type="text" class="form-control @error('username') is-invalid @enderror"
                                        id="username" name="username" value="{{ old('username', $user->username) }}" required>
                                 @error('username') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">Email *</label>
+                                <label for="email" class="form-label">Email</label>
                                 <input type="email" class="form-control @error('email') is-invalid @enderror"
                                        id="email" name="email" value="{{ old('email', $user->email) }}" required>
                                 @error('email') <span class="text-danger">{{ $message }}</span> @enderror
@@ -32,14 +32,14 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="name" class="form-label">Full Name *</label>
+                                <label for="name" class="form-label">Full Name</label>
                                 <input type="text" class="form-control @error('name') is-invalid @enderror"
                                        id="name" name="name" value="{{ old('name', $user->name) }}" required>
                                 @error('name') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="role" class="form-label">Role *</label>
+                                <label for="role" class="form-label">Role</label>
                                 <select class="form-select @error('role') is-invalid @enderror"
                                         id="role" name="role" required>
                                     @foreach($roles as $role)

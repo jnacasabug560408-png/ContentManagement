@@ -305,7 +305,7 @@
                                    class="action-btn btn-edit" title="Edit">
                                     <i class="bi bi-pencil"></i>
                                 </a>
-                                <form action="{{ route('categories.destroy', $category) }}"
+                                <form action="{{ route('categories.destroy', $category->id) }}"
                                       method="POST" style="display:inline;"
                                       onsubmit="return confirm('Delete this category?')">
                                     @csrf @method('DELETE')
@@ -335,11 +335,7 @@
             </table>
         </div>
 
-        @if($categories->hasPages())
-        <div class="pagination-wrap">
-            {{ $categories->links() }}
-        </div>
-        @endif
+        
     </div>
 
 </div>

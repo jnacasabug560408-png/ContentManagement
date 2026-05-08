@@ -30,9 +30,9 @@ class ContentController extends Controller
 
     public function publicIndex()
     {
-        $contents = Content::where('status', 'published')->latest()->paginate(12);
-        $categories = Category::withCount('contents')->get();
-        $tags = Tag::withCount('contents')->get();
+        $contents = Content::with('category', 'tags')->latest()->paginate(12);
+        $categories = Category::all();
+        $tags = Tag::all();
         return view('contents.public-index', compact('contents', 'categories', 'tags'));
     }
 
@@ -154,4 +154,20 @@ class ContentController extends Controller
         $news = \App\Models\News::with(['user', 'comments'])->latest()->paginate(15);
         return view('contents.moderation', compact('contents', 'news'));
     }
+
+    public function updateStatus(Request $request, Content $content)
+{
+    Gate::authorize('admin');
+
+    $request->validate([
+        'status' => 'required|in:draft,published,hidden',
+    ]);
+
+    $content->update([
+        'status' => $request->status,
+        'published_at' => $request->status === 'published' ? ($content->published_at ?? now()) : $content->published_at,
+    ]);
+
+    return back()->with('success', 'Status updated to ' . ucfirst($request->status) . '.');
+}
 }

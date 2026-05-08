@@ -291,7 +291,7 @@
         <div class="card border-0 mb-4" style="border-radius:16px;">
             <div class="card-body py-4">
                 <h6 class="fw-bold text-dark mb-3">
-                    <i class="bi bi-lightning-fill text-warning me-2"></i>Quick Actions
+                    <i class="bi bi text-warning me-2"></i>Quick Actions
                 </h6>
                 <div class="d-flex gap-3 flex-wrap">
                     <a href="{{ route('contents.create') }}" class="btn btn-primary rounded-pill px-4">
@@ -313,7 +313,7 @@
         <div class="card shadow-sm border-0 mb-4" style="border-radius:16px;">
             <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                 <h5 class="mb-0 fw-bold text-dark">
-                    <i class="bi bi-file-earmark-text-fill text-primary me-2"></i>My Recent Articles
+                    <i class="bi text-primary me-2"></i>My Recent Articles
                 </h5>
                 <a href="{{ route('contents.index') }}" class="btn btn-sm btn-outline-primary rounded-pill">View All</a>
             </div>

@@ -36,7 +36,12 @@ class AuthController extends Controller
             }
 
             $request->session()->regenerate();
-            return redirect()->intended('/dashboard')->with('success', 'Logged in successfully!');
+
+if ($user->role === 'subscriber') {
+    return redirect()->route('subscriber.comments')->with('success', 'Logged in successfully!');
+}
+
+return redirect()->intended('/dashboard')->with('success', 'Logged in successfully!');
         }
 
         return back()->withErrors(['login' => 'Invalid credentials.'])->onlyInput('login');

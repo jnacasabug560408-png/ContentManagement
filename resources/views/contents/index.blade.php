@@ -320,7 +320,11 @@
         color: var(--blue-light);
     }
 
-    .modal-body { padding: 28px; background: var(--white); }
+    .modal-body { 
+        padding: 28px; 
+        max-height: 65vh;
+        overflow-y: auto;
+    }
 
     .modal-footer {
         padding: 16px 28px;
@@ -564,15 +568,13 @@
                         {{-- Category + Status --}}
                         <div class="col-md-6">
                             <label class="form-label">Category</label>
-                            <select name="category_id"
-                                    class="form-select @error('category_id') is-invalid @enderror">
-                                <option value="" disabled selected>Select a category</option>
+                            <select name="category_id" class="form-select">
+                                <option value="">Select a category</option>
                                 @foreach($categories as $category)
-                                    <option value="{{ $category->id }}"
-                                        @selected(old('category_id') == $category->id)>
-                                        {{ $category->name }}
-                                    </option>
-                                @endforeach
+                                <option value="{{ $category->id }}">
+                                    {{ $category->name }}
+                                </option>
+                                 @endforeach
                             </select>
                             @error('category_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -607,9 +609,7 @@
                         {{-- Tags --}}
                         <div class="col-12">
                             <label class="form-label">Tags</label>
-                            <select name="tags[]"
-                                    class="form-select select-multi @error('tags') is-invalid @enderror"
-                                    multiple>
+                            <select name="tags[]" class="form-select select-multi" multiple>
                                 @foreach($tags as $tag)
                                     <option value="{{ $tag->id }}"
                                         @selected(is_array(old('tags')) && in_array($tag->id, old('tags')))>

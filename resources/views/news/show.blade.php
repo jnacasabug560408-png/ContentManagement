@@ -239,7 +239,7 @@
     <div class="article-card">
 
         @if($news->photo)
-            <img src="{{ asset('storage/' . $news->photo) }}"
+            <img src="{{ $news->photo }}"
                  alt="{{ $news->title }}" class="article-hero-img">
         @endif
 

@@ -440,7 +440,7 @@
                             elseif(str_contains($cn,'business')) $cs = 'background:#fef9c3;color:#b45309;border-color:#fde68a;';
                             elseif(str_contains($cn,'health')) $cs = 'background:#fff1f2;color:#e11d48;border-color:#fecdd3;';
                         @endphp
-                        <a href="{{ route('categories.show', $cat->slug) }}"
+                        <a href="{{ route('categories.show', $cat->id) }}"
                            class="cat-pill {{ isset($category) && $category->id == $cat->id ? 'active' : '' }}"
                            style="{{ $cs }}">
                             {{ $cat->name }}

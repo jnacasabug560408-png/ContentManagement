@@ -29,19 +29,14 @@
                             {{-- CATEGORY DROPDOWN --}}
                             <div class="col-md-6 mb-4">
                                 <label for="category_id" class="form-label fw-bold">Category</label>
-                                <select class="form-select @error('category_id') is-invalid @enderror" id="category_id" name="category_id" required>
-                                    <option value="" selected disabled>Select Category</option>
+                                <select class="form-select" id="category_id" name="category_id" required>
+    <option value="" selected disabled>Select Category</option>
     
-                                    {{-- Hardcoded Options base sa CMS standards --}}
-                                    <option value="1">Technology</option>
-                                    <option value="2">Lifestyle</option>
-                                    <option value="3">Education</option>
-                                    <option value="4">Health & Wellness</option>
-                                    <option value="5">Business</option>
-                                    <option value="6">Entertainment</option>
-                                </select>
-                                @error('category_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                            </div>
+    {{-- Ito ang mag-lo-loop sa lahat ng in-insert mo sa SQL --}}
+    @foreach($categories as $category)
+        <option value="{{ $category->id }}">{{ $category->name }}</option>
+    @endforeach
+</select>
 
                             {{-- STATUS --}}
                             <div class="col-md-6 mb-4">

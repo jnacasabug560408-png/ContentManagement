@@ -11,7 +11,7 @@ class Content extends Model
    protected $casts = [
         'created_at'   => 'datetime',
         'updated_at'   => 'datetime',
-        'published_at' => 'datetime', // Idagdag mo ito rito para maging Carbon object din siya
+        'published_at' => 'datetime', 
     ];
         public function user()
     {

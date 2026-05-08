@@ -7,7 +7,7 @@
     <div class="row justify-content-center">
         <div class="col-lg-6">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
                     <h5 class="mb-0">Edit Category</h5>
                 </div>
                 <div class="card-body">

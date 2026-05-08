@@ -38,7 +38,7 @@
 
     textarea.form-control { min-height: 200px; resize: vertical; }
 
-    .photo-upload-area {
+    .upload-area {
         border: 2px dashed #cbd5e1;
         border-radius: 16px;
         padding: 40px;
@@ -46,24 +46,12 @@
         cursor: pointer;
         transition: all 0.2s;
         background: #f8fafc;
-        position: relative;
+        margin-bottom: 16px;
     }
 
-    .photo-upload-area:hover { border-color: #38bdf8; background: #f0f9ff; }
-    .photo-upload-area i { font-size: 2.5rem; color: #94a3b8; margin-bottom: 12px; display: block; }
-    .photo-upload-area p { color: #64748b; margin: 0; font-size: 14px; }
-    .photo-upload-area input[type="file"] {
-        position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
-    }
-
-    #photo-preview {
-        width: 100%;
-        max-height: 300px;
-        object-fit: cover;
-        border-radius: 12px;
-        display: none;
-        margin-top: 12px;
-    }
+    .upload-area:hover { border-color: #38bdf8; background: #f0f9ff; }
+    .upload-area i { font-size: 2.5rem; color: #94a3b8; margin-bottom: 12px; display: block; }
+    .upload-area p { color: #64748b; margin: 0; font-size: 14px; }
 
     .btn-publish {
         background: linear-gradient(135deg, #0ea5e9, #2563eb);
@@ -91,7 +79,7 @@
     </div>
 
     <div class="form-card">
-        <form action="{{ route('news.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('news.store') }}" method="POST">
             @csrf
 
             {{-- Title --}}
@@ -106,29 +94,40 @@
             <div class="mb-4">
                 <label class="form-label">Category</label>
                 <select name="category" class="form-select">
-                    <option value="General" {{ old('category') == 'General' ? 'selected' : '' }}>General</option>
-                    <option value="Technology" {{ old('category') == 'Technology' ? 'selected' : '' }}>Technology</option>
-                    <option value="Politics" {{ old('category') == 'Politics' ? 'selected' : '' }}>Politics</option>
-                    <option value="Health" {{ old('category') == 'Health' ? 'selected' : '' }}>Health</option>
-                    <option value="Science" {{ old('category') == 'Science' ? 'selected' : '' }}>Science</option>
-                    <option value="Sports" {{ old('category') == 'Sports' ? 'selected' : '' }}>Sports</option>
+                    <option value="General"       {{ old('category') == 'General'       ? 'selected' : '' }}>General</option>
+                    <option value="Technology"    {{ old('category') == 'Technology'    ? 'selected' : '' }}>Technology</option>
+                    <option value="Politics"      {{ old('category') == 'Politics'      ? 'selected' : '' }}>Politics</option>
+                    <option value="Health"        {{ old('category') == 'Health'        ? 'selected' : '' }}>Health</option>
+                    <option value="Science"       {{ old('category') == 'Science'       ? 'selected' : '' }}>Science</option>
+                    <option value="Sports"        {{ old('category') == 'Sports'        ? 'selected' : '' }}>Sports</option>
                     <option value="Entertainment" {{ old('category') == 'Entertainment' ? 'selected' : '' }}>Entertainment</option>
-                    <option value="Business" {{ old('category') == 'Business' ? 'selected' : '' }}>Business</option>
-                    <option value="Lifestyle" {{ old('category') == 'Lifestyle' ? 'selected' : '' }}>Lifestyle</option>
+                    <option value="Business"      {{ old('category') == 'Business'      ? 'selected' : '' }}>Business</option>
+                    <option value="Lifestyle"     {{ old('category') == 'Lifestyle'     ? 'selected' : '' }}>Lifestyle</option>
                 </select>
             </div>
 
-            {{-- Photo Upload --}}
+            {{-- Cover Photo --}}
             <div class="mb-4">
                 <label class="form-label">Cover Photo</label>
-                <div class="photo-upload-area" id="upload-area">
-                    <input type="file" name="photo" id="photo-input" accept="image/*">
-                    <i class="bi bi-image"></i>
-                    <p><strong>Click to upload</strong> or drag & drop</p>
-                    <p class="mt-1" style="font-size:12px; color:#94a3b8;">PNG, JPG, WEBP up to 5MB</p>
+
+                <input type="hidden" name="photo" id="photo-url" value="{{ old('photo') }}">
+
+                <div class="upload-area" onclick="openWidget()">
+                    <img id="preview-img"
+                         src="{{ old('photo') }}"
+                         style="{{ old('photo') ? 'display:block;' : 'display:none;' }} width:100%; max-height:300px; object-fit:cover; border-radius:10px; margin-bottom:10px;">
+                    <div id="upload-placeholder" style="{{ old('photo') ? 'display:none;' : '' }}">
+                        <i class="bi bi-cloud-upload"></i>
+                        <p><strong>Click to upload</strong> via Cloudinary</p>
+                        <p class="mt-1" style="font-size:12px;">PNG, JPG, WEBP up to 5MB</p>
+                    </div>
+                    <div id="upload-success" style="{{ old('photo') ? '' : 'display:none;' }} margin-top:8px;">
+                        <span class="badge bg-success">
+                            <i class="bi bi-check-circle me-1"></i> Photo uploaded
+                        </span>
+                        <p class="mt-2" style="font-size:12px; color:#64748b;">Click to change photo</p>
+                    </div>
                 </div>
-                <img id="photo-preview" src="" alt="Preview">
-                @error('photo')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
             </div>
 
             {{-- Body --}}
@@ -154,22 +153,28 @@
 @endsection
 
 @section('scripts')
+<script src="https://upload-widget.cloudinary.com/global/all.js"></script>
 <script>
-    const input = document.getElementById('photo-input');
-    const preview = document.getElementById('photo-preview');
-    const uploadArea = document.getElementById('upload-area');
-
-    input.addEventListener('change', function () {
-        const file = this.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = e => {
-                preview.src = e.target.result;
-                preview.style.display = 'block';
-                uploadArea.style.borderColor = '#38bdf8';
-            };
-            reader.readAsDataURL(file);
+function openWidget() {
+    cloudinary.openUploadWidget({
+        cloudName: 'dtc3jr6gg',
+        uploadPreset: 'mediaaa', // ← Replace after creating preset
+        sources: ['local', 'url', 'camera'],
+        multiple: false,
+        folder: 'news-photos',
+        clientAllowedFormats: ['png', 'jpg', 'jpeg', 'webp'],
+        maxFileSize: 5000000,
+    }, function(error, result) {
+        if (!error && result && result.event === 'success') {
+            const url = result.info.secure_url;
+            document.getElementById('photo-url').value = url;
+            const preview = document.getElementById('preview-img');
+            preview.src = url;
+            preview.style.display = 'block';
+            document.getElementById('upload-placeholder').style.display = 'none';
+            document.getElementById('upload-success').style.display = 'block';
         }
     });
+}
 </script>
 @endsection

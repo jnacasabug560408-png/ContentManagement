@@ -19,8 +19,7 @@ Route::get('/', function () {
 Route::get('/posts', [ContentController::class, 'publicIndex'])->name('posts.public.index');
 Route::get('/posts/{content:slug}', [ContentController::class, 'show'])->name('posts.public.show');
 Route::get('/tags/{tag:slug}', [TagController::class, 'show'])->name('tags.show');
-Route::get('/category-filter/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');
-
+Route::get('/category-filter/{category:slug}', [CategoryController::class, 'show'])->name('categories.filter');
 // 2. GUEST ROUTES
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -71,7 +70,6 @@ Route::middleware('auth')->group(function () {
         Route::patch('/comments/{comment}/reject', [CommentController::class, 'reject'])->name('comments.reject');
         Route::patch('/comments/{comment}/spam', [CommentController::class, 'spam'])->name('comments.spam');
         Route::patch('/contents/{content}/publish', [ContentController::class, 'publish'])->name('contents.publish');
-        Route::patch('/contents/{content}/unpublish', [ContentController::class, 'unpublish'])->name('contents.unpublish');
         Route::get('/contents-moderation', [ContentController::class, 'moderation'])->name('contents.moderation');
     });
 

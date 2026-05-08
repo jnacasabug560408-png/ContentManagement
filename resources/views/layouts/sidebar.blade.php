@@ -103,15 +103,6 @@
                 </a>
             </li>
 
-            @if($canModerate)
-                <div class="small text-uppercase text-secondary mt-3 mb-2" style="font-size: 0.7rem;">Moderation</div>
-                <li class="nav-item mb-2">
-                    <a class="nav-link text-white {{ request()->routeIs('comments.*') ? 'opacity-100 fw-bold' : 'opacity-75' }}"
-                       href="{{ route('comments.index') }}">
-                        <i class="bi bi-chat-dots me-2 text-warning"></i> Moderate Comments
-                    </a>
-                </li>
-            @endif
 
             {{-- ADMIN ONLY --}}
             @if($isAdmin)
