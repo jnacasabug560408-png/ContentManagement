@@ -121,9 +121,12 @@ RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framewor
 && chmod -R 775 storage bootstrap/cache public/uploads
 
 
+RUN php artisan migrate --force || true
+RUN php artisan config:clear || true
+RUN php artisan route:clear || true
+RUN php artisan view:clear || true
+RUN php artisan cache:clear || true
 
 EXPOSE 10000
-
-
 
 CMD ["apache2-foreground"]

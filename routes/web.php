@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
@@ -10,6 +11,29 @@ use App\Http\Controllers\TagController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\NewsController;
+use App\Models\User;
+use App\Models\Content;
+
+// ── DEFINE GATES AT THE START ──
+Gate::define('admin', function (User $user) {
+    return $user->isAdmin();
+});
+
+Gate::define('moderate.comments', function (User $user) {
+    return in_array($user->role, ['admin', 'editor']);
+});
+
+Gate::define('canCreateContent', function (User $user) {
+    return $user->canCreateContent();
+});
+
+Gate::define('edit.content', function (User $user, Content $content) {
+    return $user->isAdmin() || $content->user_id === $user->id;
+});
+
+Gate::define('delete.content', function (User $user, Content $content) {
+    return $user->isAdmin() || $content->user_id === $user->id;
+});
 
 // 1. LANDING PAGE & PUBLIC VIEWING
 Route::get('/', function () {
@@ -20,6 +44,7 @@ Route::get('/posts', [ContentController::class, 'publicIndex'])->name('posts.pub
 Route::get('/posts/{content:slug}', [ContentController::class, 'show'])->name('posts.public.show');
 Route::get('/tags/{tag:slug}', [TagController::class, 'show'])->name('tags.show');
 Route::get('/category-filter/{category:slug}', [CategoryController::class, 'show'])->name('categories.filter');
+
 // 2. GUEST ROUTES
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -57,11 +82,9 @@ Route::middleware('auth')->group(function () {
     Route::put('/my-news/{news}', [NewsController::class, 'update'])->name('news.update');
     Route::delete('/my-news/{news}', [NewsController::class, 'destroy'])->name('news.destroy');
 
-    // ── CONTENT CREATION ──
-    Route::middleware('can:canCreateContent')->group(function () {
-        Route::resource('contents', ContentController::class);
-        Route::resource('media', MediaController::class)->only(['index', 'store', 'destroy']);
-    });
+    // ── CONTENT CREATION ── (Available to all authenticated users)
+    Route::resource('contents', ContentController::class);
+    Route::resource('media', MediaController::class)->only(['index', 'store', 'destroy']);
 
     // ── MODERATION ──
     Route::middleware('can:moderate.comments')->group(function () {
